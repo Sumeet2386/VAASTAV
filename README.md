@@ -59,8 +59,12 @@ Frontend runs on:
 
 http://localhost:5173
 
-Use Cases
-Deepfake detection
-AI voice scam detection
-Certificate authenticity validation
+Use Cases:-
+
+Deepfake detection,
+
+AI voice scam detection,
+
+Certificate authenticity validation,
+
 Media integrity verification
