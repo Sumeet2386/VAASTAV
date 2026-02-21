@@ -39,7 +39,9 @@ Project Structure
 How to Run 
 Backend :-
 cd backend
+
 pip install -r requirements.txt
+
 uvicorn app.main:app --reload
 
 
@@ -47,7 +49,7 @@ Backend runs on:
 
 http://127.0.0.1:8000
 
-Frontend ;-
+Frontend :-
 cd frontend
 npm install
 npm run dev
