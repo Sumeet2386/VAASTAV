@@ -4,11 +4,17 @@ from app.services.video.detect import verify_video
 from app.services.certificate.detect import process_certificate
 from app.services.audio.detect import verify_audio
 import os
+import uuid
 
 router = APIRouter()
 
 TEMP_DIR = "temp"
 os.makedirs(TEMP_DIR, exist_ok=True)
+
+
+def secure_filename(filename):
+    # Generate a unique filename using UUID to prevent path traversal
+    return str(uuid.uuid4()) + os.path.splitext(filename)[1]
 
 
 # ================= IMAGE =================
@@ -18,7 +24,7 @@ async def verify_image_api(file: UploadFile = File(...)):
         if not file.content_type.startswith("image/"):
             return {"status": "error", "message": "Invalid file type"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        file_path = os.path.join(TEMP_DIR, secure_filename(file.filename))
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
@@ -43,7 +49,7 @@ async def verify_video_api(file: UploadFile = File(...)):
         if not file.content_type.startswith("video/"):
             return {"status": "error", "message": "Invalid file type"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        file_path = os.path.join(TEMP_DIR, secure_filename(file.filename))
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
@@ -68,7 +74,7 @@ async def verify_certificate_api(file: UploadFile = File(...)):
         if not file.content_type.startswith(("image/", "application/pdf")):
             return {"status": "error", "message": "Invalid certificate format"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        file_path = os.path.join(TEMP_DIR, secure_filename(file.filename))
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
@@ -96,7 +102,7 @@ async def verify_audio_api(file: UploadFile = File(...)):
         if not file.content_type.startswith("audio/"):
             return {"status": "error", "message": "Invalid audio file"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        file_path = os.path.join(TEMP_DIR, secure_filename(file.filename))
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
