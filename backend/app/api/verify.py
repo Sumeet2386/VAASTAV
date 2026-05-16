@@ -4,11 +4,17 @@ from app.services.video.detect import verify_video
 from app.services.certificate.detect import process_certificate
 from app.services.audio.detect import verify_audio
 import os
+from pathlib import Path
 
 router = APIRouter()
 
 TEMP_DIR = "temp"
 os.makedirs(TEMP_DIR, exist_ok=True)
+
+
+def secure_filename(filename: str) -> str:
+    # Remove any path traversal characters
+    return os.path.basename(filename)
 
 
 # ================= IMAGE =================
@@ -18,11 +24,12 @@ async def verify_image_api(file: UploadFile = File(...)):
         if not file.content_type.startswith("image/"):
             return {"status": "error", "message": "Invalid file type"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        safe_filename = secure_filename(file.filename)
+        file_path = Path(TEMP_DIR) / safe_filename
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
-        result = verify_image(file_path)
+        result = verify_image(str(file_path))
 
         return {
             "status": "success",
@@ -43,11 +50,12 @@ async def verify_video_api(file: UploadFile = File(...)):
         if not file.content_type.startswith("video/"):
             return {"status": "error", "message": "Invalid file type"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        safe_filename = secure_filename(file.filename)
+        file_path = Path(TEMP_DIR) / safe_filename
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
-        result = verify_video(file_path)
+        result = verify_video(str(file_path))
 
         return {
             "status": "success",
@@ -68,11 +76,12 @@ async def verify_certificate_api(file: UploadFile = File(...)):
         if not file.content_type.startswith(("image/", "application/pdf")):
             return {"status": "error", "message": "Invalid certificate format"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        safe_filename = secure_filename(file.filename)
+        file_path = Path(TEMP_DIR) / safe_filename
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
-        result = process_certificate(file_path)
+        result = process_certificate(str(file_path))
 
         return {
             "status": "success",
@@ -96,11 +105,12 @@ async def verify_audio_api(file: UploadFile = File(...)):
         if not file.content_type.startswith("audio/"):
             return {"status": "error", "message": "Invalid audio file"}
 
-        file_path = f"{TEMP_DIR}/{file.filename}"
+        safe_filename = secure_filename(file.filename)
+        file_path = Path(TEMP_DIR) / safe_filename
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
-        result = verify_audio(file_path)
+        result = verify_audio(str(file_path))
 
         # If your model already returns correct keys
         return result
